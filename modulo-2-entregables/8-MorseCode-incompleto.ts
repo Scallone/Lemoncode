@@ -1,40 +1,42 @@
 class Transmitter {
     private text: string;
-    private bulb: string[];
+    private delay: number = 0;
 
-    constructor(text: string){
-        this.text = text;
+    constructor(text: string) {
+        this.text = text.toLowerCase(); // Esto es por si acaso alguien probaba con mayúsculas
     }
 
-    transmit() {
+    public transmit() {
         this.decrypt();
         this.writer();
     }
 
-    private decryptLetter(letter:string) : string {
-        return letter !== " " ? morseAlphabet[letter] : " ";
-      }
-
-    private decrypt() {
-        this.text = this.text.split("").map(this.decryptLetter).join("");
-      }
-
-    private writer(){
-        console.log(this.text); // Para ver el morse generado
-        // Para cada carácter en morse generado, lightBulb debería proporcionar el timeout en el que mostrar o 0 o 1
-        this.text.split("").map(this.lightBulb).join("");
+    private decryptLetter(letter: string): string {
+        // Pequeño parseo para identificar los cambios de símbolo con "/" que se van a usar luego (ver objeto timing)
+        return letter !== " " ? morseAlphabet[letter].split("").join("/") : " ";
     }
 
-    private lightBulb(letter:string) {
-        return setInterval(
-            function() { 
-                console.log(letter === "." ? 1 : 0)
-            },
-            timing[letter]);
-    } 
+    private decrypt() {
+        // Generamos el morse y identificamos los cambios de letra con un "+", que se va a usar luego (ver objeto timing)
+        this.text = this.text.split("").map(this.decryptLetter).join("+");
+    }
+
+    private getDelay(symbol: string): number {
+        // Dado un t inicial, cada vez que se llame se le sumará el delay asociado a un símbolo
+        return this.delay = this.delay + timing[symbol].delay;
+    }
+    private writer() {
+        this.text.split("")
+            .forEach(
+                (symbol: string) =>
+                    setTimeout(() => console.log(timing[symbol].state),
+                        this.getDelay(symbol))
+            );
+    }
+
 }
 
-const text:string = 'Prueba de mensaje a morsificar';
+const text: string = 'sos';
 const morseAlphabet = {
     "0": "-----",
     "1": ".----",
@@ -81,16 +83,35 @@ const morseAlphabet = {
     "@": ".--.-.",
     "(": "-.--.",
     ")": "-.--.-"
-  }
+}
 
-  const timing = {
-    ".": 1000,
-    "-": 1000*3,
-    " ": 1000*7
-  }
+const timing = {
+    ".": {
+        "delay": 1000,
+        "state": "ON"
+    },
+    "+": { // Auxiliar: lo usamos para identificar cambio de letra
+        "delay": 1000 * 3,
+        "state": "OFF"
+    },
+    "-": {
+        "delay": 1000 * 3,
+        "state": "ON"
+    },
+    " ": { // El cambio de palabra
+        "delay": 1000 * 7,
+        "state": "OFF"
+    },
+    "/": { // Auxiliar: lo usamos para identificar un cambio de símbol (.- , .. , -. , --)
+        "delay": 1000,
+        "state": "OFF"
+    }
+}
 
- function transmitMessage(text: string){
+function transmitMessage(text: string) {
     return new Transmitter(text);
 }
+
 console.log(text);
+
 const morsify = transmitMessage(text).transmit();
