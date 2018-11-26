@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack:///./mystyles.scss"],"names":[],"mappings":"AAAA;AACA;AACA,iDAAiD;;AAEjD;AACA;AACA,eAAe","file":"main.css","sourcesContent":[".test {\n  background-color: teal;\n  font-family: 'Courier New', Courier, monospace; }\n\nimg {\n  display: block;\n  width: 200px; }\n"],"sourceRoot":""}
