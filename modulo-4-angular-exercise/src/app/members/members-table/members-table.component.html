@@ -1,0 +1,15 @@
+<h2>Members Page</h2>
+<label>Org Name:
+  <input [(ngModel)]="orgName" placeholder="Org Name">
+</label><button (click)="loadMembers()">Load</button>
+<table>
+  <thead>
+    <app-member-head></app-member-head>
+  </thead>
+  <tbody>
+    <app-member-row [member]="member" *ngFor="let member of members">
+    </app-member-row>
+  </tbody>
+</table>
+
+
